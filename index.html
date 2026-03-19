@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Role 2 Meds">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Role 2 Meds | 1st Med Bn</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #0d1117;
+      --surf:   #161b22;
+      --surf2:  #21262d;
+      --border: #30363d;
+      --text:   #e6edf3;
+      --dim:    #8b949e;
+      --accent: #58a6ff;
+      --green:  #3fb950;
+      --warn:   #f97316;
+    }
+
+    html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
+    body { display: flex; flex-direction: column; }
+
+    /* ── HEADER ──────────────────────────── */
+    header {
+      background: var(--surf); border-bottom: 1px solid var(--border);
+      padding: 10px 14px; padding-top: max(10px, env(safe-area-inset-top));
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .hdr-title { flex: 1; }
+    .hdr-title h1 { font-size: 16px; font-weight: 700; line-height: 1.2; }
+    .hdr-title p  { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; }
+    .icon-btn {
+      background: var(--surf2); border: 1px solid var(--border); border-radius: 9px;
+      width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--dim); flex-shrink: 0;
+    }
+    .icon-btn:active { opacity: .65; }
+
+    /* ── SEARCH ──────────────────────────── */
+    .search-wrap {
+      background: var(--surf); border-bottom: 1px solid var(--border);
+      padding: 8px 14px; display: none; flex-shrink: 0;
+    }
+    .search-wrap.open { display: block; }
+    .search-wrap input {
+      width: 100%; background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 9px; padding: 9px 13px; color: var(--text); font-size: 16px; outline: none;
+    }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap input::placeholder { color: var(--dim); }
+
+    /* ── WEIGHT BAR ──────────────────────── */
+    .weight-bar {
+      background: var(--surf); border-bottom: 1px solid var(--border);
+      padding: 8px 14px; display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap; flex-shrink: 0;
+    }
+    .wt-lbl { font-size: 10px; font-weight: 700; color: var(--dim);
+      text-transform: uppercase; letter-spacing: .07em; flex-shrink: 0; }
+    .wt-input-group {
+      display: flex; align-items: center; gap: 4px;
+      background: var(--surf2); border: 1px solid var(--border); border-radius: 9px;
+      padding: 3px 8px 3px 6px; flex-shrink: 0;
+    }
+    .wt-input-group.active { border-color: var(--green); }
+    .wt-input-group input {
+      width: 50px; background: transparent; border: none; outline: none;
+      color: var(--text); font-size: 14px; font-weight: 600; text-align: right;
+      -moz-appearance: textfield;
+    }
+    .wt-input-group input::-webkit-outer-spin-button,
+    .wt-input-group input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .wt-input-group input::placeholder { color: var(--dim); font-weight: 400; }
+    .wt-unit { font-size: 12px; color: var(--dim); flex-shrink: 0; }
+    .wt-clear { background: none; border: none; color: var(--dim); cursor: pointer;
+      font-size: 14px; line-height: 1; padding: 0 0 0 2px; display: none; }
+    .bracket-badge {
+      font-size: 11px; font-weight: 700; color: var(--green);
+      background: #0d2818; border: 1px solid #1a4a2a; border-radius: 6px;
+      padding: 2px 7px; flex-shrink: 0; display: none;
+    }
+    .bracket-badge.show { display: block; }
+    .weight-toggle { display: flex; background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 9px; overflow: hidden; flex-shrink: 0; }
+    .wbtn { padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--dim);
+      background: transparent; border: none; cursor: pointer; min-height: 32px; transition: all .15s; }
+    .wbtn.active { background: var(--accent); color: #0d1117; }
+
+    /* ── SCENARIO FILTER BAR ─────────────── */
+    .filter-bar {
+      background: var(--surf); border-bottom: 1px solid var(--border);
+      padding: 7px 14px; display: flex; align-items: center; gap: 6px;
+      overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .fpill {
+      padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 700;
+      border: 1px solid var(--border); background: var(--surf2); color: var(--dim);
+      cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all .15s;
+    }
+    .fpill.active { border-color: var(--fc, var(--accent)); background: var(--fc, var(--accent)); color: #0d1117; }
+
+    /* ── CATEGORY TABS ───────────────────── */
+    .cat-tabs {
+      background: var(--surf); border-bottom: 1px solid var(--border);
+      display: flex; overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
+    }
+    .cat-tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      padding: 0 14px; font-size: 11px; font-weight: 700; color: var(--dim);
+      background: transparent; border: none; border-bottom: 3px solid transparent;
+      cursor: pointer; white-space: nowrap; text-transform: uppercase; letter-spacing: .05em;
+      height: 40px; display: flex; align-items: center; flex-shrink: 0; transition: all .15s;
+    }
+    .tab.active { color: var(--text); border-bottom-color: var(--cc, var(--accent)); }
+    .cat-tabs.filtered .tab { opacity: .4; }
+    .cat-tabs.filtered .tab.active { opacity: 1; }
+
+    /* ── SCENARIO HEADER ─────────────────── */
+    .scenario-hdr {
+      display: none; align-items: center; gap: 8px;
+      background: var(--surf); border-bottom: 1px solid var(--border);
+      padding: 6px 14px; flex-shrink: 0;
+    }
+    .scenario-hdr.show { display: flex; }
+    .scenario-pill {
+      display: inline-block; padding: 4px 12px; border-radius: 99px; font-size: 12px;
+      font-weight: 700; border: 1px solid var(--fc, var(--accent)); color: var(--fc, var(--accent));
+    }
+    .scenario-count { font-size: 12px; color: var(--dim); }
+
+    /* ── CONTENT ─────────────────────────── */
+    .content {
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 10px 12px; padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+
+    /* ── DISCLAIMER ──────────────────────── */
+    .disclaimer {
+      background: #1c130a; border: 1px solid #5a3010; border-radius: 9px;
+      padding: 8px 12px; margin-bottom: 10px; font-size: 11px; color: var(--warn); line-height: 1.5;
+    }
+
+    /* ── DRUG CARDS ──────────────────────── */
+    .drug-card {
+      background: var(--surf); border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 8px; overflow: hidden;
+    }
+    .card-hdr {
+      padding: 12px 13px; display: flex; align-items: center; gap: 9px;
+      cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .card-hdr:active { background: var(--surf2); }
+    .cat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cc, var(--accent)); flex-shrink: 0; }
+    .drug-name { font-size: 15px; font-weight: 700; flex: 1; }
+    .cat-badge {
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+      color: var(--cc, var(--accent));
+      background: color-mix(in srgb, var(--cc, var(--accent)) 15%, transparent);
+      border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 30%, transparent);
+      border-radius: 5px; padding: 2px 6px; flex-shrink: 0;
+    }
+    .chevron { color: var(--dim); font-size: 10px; transition: transform .2s; flex-shrink: 0; }
+    .drug-card.open .chevron { transform: rotate(180deg); }
+    .card-body { display: none; border-top: 1px solid var(--border); }
+    .drug-card.open .card-body { display: block; }
+
+    /* ── DOSE DISPLAY ────────────────────── */
+    .dose-single { padding: 11px 13px; }
+    .dose-row { margin-bottom: 9px; }
+    .dose-row:last-child { margin-bottom: 0; }
+    .dose-lbl { font-size: 10px; font-weight: 700; color: var(--dim);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px; }
+    .dose-val { font-size: 14px; color: var(--text); line-height: 1.45; white-space: pre-line; }
+    .dose-val.na { color: var(--surf2); }
+    .dose-val.hl { color: #ffd60a; font-weight: 600; }
+    .dose-both { display: grid; grid-template-columns: 1fr 1fr; }
+    .dose-col { padding: 11px 13px; border-right: 1px solid var(--border); }
+    .dose-col:last-child { border-right: none; }
+    .col-hdr { font-size: 10px; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 7px; }
+
+    /* ── DRUG DETAILS ────────────────────── */
+    .detail-sep { border: none; border-top: 1px solid var(--border); }
+    .detail-meta { padding: 9px 13px; display: flex; flex-direction: column; gap: 5px; }
+    .detail-row { display: flex; gap: 8px; }
+    .detail-lbl {
+      font-size: 9px; font-weight: 700; color: var(--dim); text-transform: uppercase;
+      letter-spacing: .07em; flex-shrink: 0; min-width: 62px; padding-top: 2px;
+    }
+    .detail-val { font-size: 12px; color: var(--text); line-height: 1.45; }
+    .detail-notes { padding: 0 13px 10px; display: flex; flex-direction: column; gap: 4px; }
+    .dnote {
+      font-size: 12px; line-height: 1.5; padding-left: 12px; position: relative; color: var(--dim);
+    }
+    .dnote::before { content: '\2022'; position: absolute; left: 0; }
+    .dcaution { color: #f97316; }
+    .dcaution::before { content: '\26A0'; font-size: 10px; }
+
+    /* ── HYPOTENSION BADGE ───────────────── */
+    .htn-badge {
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+      color: #ef4444; background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.35);
+      border-radius: 5px; padding: 2px 6px; flex-shrink: 0; white-space: nowrap;
+    }
+
+    /* ── NOTES TAB ───────────────────────── */
+    .note-card {
+      background: var(--surf); border: 1px solid var(--border);
+      border-radius: 12px; padding: 13px 15px; margin-bottom: 8px;
+    }
+    .note-card h3 { font-size: 11px; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 9px; }
+    .note-card ul { padding-left: 15px; }
+    .note-card li { font-size: 13px; color: var(--dim); line-height: 1.6; margin-bottom: 4px; }
+
+    /* ── EMPTY ───────────────────────────── */
+    .empty { text-align: center; padding: 52px 24px; color: var(--dim); }
+    .empty h3 { font-size: 16px; margin-bottom: 8px; }
+    .empty p   { font-size: 14px; }
+
+    /* ── INSTALL BANNER ─────────────────── */
+    .install-banner {
+      display: none; background: linear-gradient(135deg, #1a2332, #162230);
+      border: 1px solid #1f4068; border-radius: 12px;
+      padding: 12px 14px; margin: 10px 12px 0;
+      flex-shrink: 0; animation: slideDown .3s ease;
+    }
+    .install-banner.show { display: block; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .install-inner { display: flex; align-items: center; gap: 10px; }
+    .install-icon { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; }
+    .install-text { flex: 1; }
+    .install-text strong { font-size: 13px; color: var(--text); display: block; }
+    .install-text span { font-size: 11px; color: var(--dim); }
+    .install-btn {
+      background: var(--accent); color: #0d1117; border: none; border-radius: 8px;
+      padding: 8px 16px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+    }
+    .install-btn:active { opacity: .7; }
+    .install-dismiss {
+      background: none; border: none; color: var(--dim); font-size: 18px;
+      cursor: pointer; padding: 0 0 0 4px; line-height: 1;
+    }
+    .offline-badge {
+      display: none; font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--green); background: #0d2818;
+      border: 1px solid #1a4a2a; border-radius: 6px; padding: 3px 8px; flex-shrink: 0;
+    }
+    .offline-badge.show { display: flex; align-items: center; gap: 4px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-title">
+    <h1>Role 2 Medications</h1>
+    <p>1st Medical Battalion</p>
+  </div>
+  <button class="icon-btn" onclick="toggleSearch()" aria-label="Search">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.5" stroke-linecap="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+  </button>
+  <div class="offline-badge" id="offlineBadge">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+    Offline Ready
+  </div>
+</header>
+
+<div class="install-banner" id="installBanner">
+  <div class="install-inner">
+    <img src="icons/icon-192.png" class="install-icon" alt="">
+    <div class="install-text">
+      <strong>Install Role 2 Meds</strong>
+      <span>Add to home screen for offline use</span>
+    </div>
+    <button class="install-btn" id="installBtn" onclick="installApp()">Install</button>
+    <button class="install-dismiss" onclick="dismissInstall()">&#x2715;</button>
+  </div>
+</div>
+
+<div class="search-wrap" id="searchWrap">
+  <input type="search" id="searchInput" placeholder="Search medications..."
+    autocomplete="off" autocorrect="off" spellcheck="false"
+    oninput="handleSearch(this.value)"
+    onkeydown="if(event.key==='Escape')toggleSearch()">
+</div>
+
+<div class="weight-bar">
+  <span class="wt-lbl">PT WT</span>
+  <div class="wt-input-group" id="wtGroup">
+    <input type="number" id="wtInput" min="1" max="300" placeholder="— kg"
+      oninput="handleWeightInput(this.value)" onfocus="this.select()">
+    <span class="wt-unit">kg</span>
+    <button class="wt-clear" id="wtClear" onclick="clearWeight()">&#x2715;</button>
+  </div>
+  <div class="bracket-badge" id="bracketBadge"></div>
+  <div class="weight-toggle">
+    <button class="wbtn active" id="w75"   onclick="setWeight('75',true)">75 kg</button>
+    <button class="wbtn"        id="wBoth" onclick="setWeight('both',true)">Both</button>
+    <button class="wbtn"        id="w100"  onclick="setWeight('100',true)">100 kg</button>
+  </div>
+</div>
+
+<div class="filter-bar"  id="filterBar"></div>
+<div class="cat-tabs"    id="catTabs"></div>
+
+<div class="scenario-hdr" id="scenarioHdr">
+  <div class="scenario-pill" id="scenarioPill"></div>
+  <span class="scenario-count" id="scenarioCount"></span>
+</div>
+
+<div class="content" id="content"></div>
+
+<script>
+'use strict';
+
+/* ── CATEGORIES ──────────────────────────── */
+const CATS = [
+  { key: 'vasopressors',  label: 'Vasopressors',  color: '#ef4444' },
+  { key: 'sedatives',     label: 'Sedatives',      color: '#3b82f6' },
+  { key: 'nmb',           label: 'NM Blockers',    color: '#a855f7' },
+  { key: 'resuscitation', label: 'Resuscitation',  color: '#f97316' },
+  { key: 'antibiotics',   label: 'Antibiotics',    color: '#22c55e' },
+  { key: 'other',         label: 'Other',          color: '#eab308' },
+  { key: 'notes',         label: 'Notes',          color: '#6b7280' },
+];
+
+/* ── SCENARIO FILTERS ────────────────────── */
+const FILTERS = [
+  { key: 'all',        label: 'All Drugs',       color: '#58a6ff' },
+  { key: 'procedural', label: 'Procedural Sed',  color: '#0ea5e9' },
+  { key: 'rsi',        label: 'RSI / Airway',    color: '#ef4444' },
+  { key: 'analgesia',  label: 'Analgesia',       color: '#f97316' },
+  { key: 'sedation',   label: 'Sedation',        color: '#3b82f6' },
+  { key: 'cardiac',    label: 'Cardiac',         color: '#ec4899' },
+  { key: 'reversal',   label: 'Reversal',        color: '#22c55e' },
+];
+
+/* ── MEDICATION DATA ─────────────────────── */
+/*
+  Each drug:
+    tags:     string[]   — which scenario filters include this drug
+    subdoses: { [filter]: { push75, push100, drip75?, drip100?, dripLabel? } }
+    details:  { onset, duration, max, repeat, notes[], cautions[] }
+*/
+const MEDS = {
+
+  vasopressors: [
+    {
+      name: 'Epinephrine',
+      tags: ['cardiac'],
+      kg75:  { push: '1 mg (cardiac arrest)',  dripStart: '3.75–7.5 mcg/min',  dripRange: '3.75–150 mcg/min' },
+      kg100: { push: '1 mg (cardiac arrest)',  dripStart: '5–10 mcg/min',       dripRange: '5–200 mcg/min' },
+      details: {
+        onset:    'Immediate IV',
+        duration: '5–10 min (infusion titrated to effect)',
+        max:      'No defined max; titrate to hemodynamic response',
+        repeat:   'Cardiac arrest: 1 mg IV every 3–5 min',
+        notes:    ['Central or IO line preferred for infusion', 'Extravasation causes tissue necrosis — phentolamine antidote'],
+        cautions: ['Tachyarrhythmias at higher doses', 'Peripheral IV: dilute well and monitor site closely'],
+      },
+    },
+    {
+      name: 'Norepinephrine',
+      tags: ['cardiac'],
+      kg75:  { push: '—', dripStart: '7.5–15 mcg/min',  dripRange: '7.5–150 mcg/min' },
+      kg100: { push: '—', dripStart: '10–20 mcg/min',   dripRange: '10–200 mcg/min' },
+      details: {
+        onset:    '1–2 min IV',
+        duration: '1–2 min after stopping infusion',
+        max:      'No defined max; titrate to MAP goal (65 mmHg)',
+        repeat:   'N/A — continuous infusion only',
+        notes:    ['First-line vasopressor for septic shock (Surviving Sepsis Guidelines)', 'Central line strongly preferred for infusion'],
+        cautions: ['Extravasation: severe tissue necrosis — phentolamine antidote', 'Increases afterload — use caution in cardiogenic shock'],
+      },
+    },
+    {
+      name: 'Phenylephrine',
+      tags: ['cardiac'],
+      kg75:  { push: '50–200 mcg', dripStart: '7.5–75 mcg/min',  dripRange: '7.5–750 mcg/min' },
+      kg100: { push: '50–200 mcg', dripStart: '10–100 mcg/min',  dripRange: '10–1000 mcg/min' },
+      details: {
+        onset:    'Immediate IV push',
+        duration: '15–20 min (push); continuous with infusion',
+        max:      'Push: 200 mcg per dose; Infusion: titrate to effect',
+        repeat:   'Push: every 10–15 min PRN',
+        notes:    ['Pure α1 agonist — no inotropic effect', 'Preferred in neurogenic shock and spinal anesthesia hypotension'],
+        cautions: ['Reflex bradycardia — avoid if heart rate already low', 'Reduces cardiac output in patients with depressed EF'],
+      },
+    },
+    {
+      name: 'Dopamine',
+      tags: ['cardiac'],
+      kg75:  { push: '—', dripStart: '150–375 mcg/min',  dripRange: '150–1500 mcg/min' },
+      kg100: { push: '—', dripStart: '200–500 mcg/min',  dripRange: '200–2000 mcg/min' },
+      details: {
+        onset:    '2–4 min',
+        duration: 'Minutes after stopping infusion',
+        max:      '20 mcg/kg/min (some protocols up to 50)',
+        repeat:   'N/A — continuous infusion only',
+        notes:    ['Low dose (1–5 mcg/kg/min): dopaminergic (renal perfusion)', 'Mid dose (5–15): β1 inotrope/chronotrope', 'High dose (>15): α1 vasoconstriction'],
+        cautions: ['More arrhythmogenic than norepinephrine (AHA/ACC)', 'No longer first-line for most indications'],
+      },
+    },
+  ],
+
+  sedatives: [
+    {
+      name: 'Propofol',
+      tags: ['sedation', 'rsi', 'procedural'],
+      htnRisk: true,
+      subdoses: {
+        sedation:   { push75: '20–40 mg',   push100: '25–50 mg',  drip75: '25–200 mcg/kg/min', drip100: '25–200 mcg/kg/min', dripLabel: 'Sedation infusion' },
+        rsi:        { push75: '20–40 mg',   push100: '25–50 mg' },
+        procedural: { push75: '37.5 mg initial; 18–19 mg q3–5 min PRN (0.5 mg/kg → 0.25 mg/kg)', push100: '50 mg initial; 25 mg q3–5 min PRN (0.5 mg/kg → 0.25 mg/kg)' },
+      },
+      kg75:  { push: '20–40 mg',  dripStart: '25–50 mcg/kg/min', dripRange: '25–200 mcg/kg/min' },
+      kg100: { push: '25–50 mg',  dripStart: '25–50 mcg/kg/min', dripRange: '25–200 mcg/kg/min' },
+      details: {
+        onset:    '15–45 sec IV',
+        duration: '5–10 min (short bolus)',
+        max:      'Infusion: 4 mg/kg/hr for routine sedation (PRIS risk at higher doses/prolonged use)',
+        repeat:   'Bolus: every 5–10 min PRN; procedural: 0.25 mg/kg supplemental q3–5 min',
+        notes:    ['Lipid emulsion: 1.1 kcal/mL — count toward nutritional goal', 'Pain on injection — lidocaine 20–40 mg IV prior reduces discomfort'],
+        cautions: ['HYPOTENSION: vasodilator + negative inotrope — can cause severe hypotension with bolus, especially in hypovolemic or hemodynamically unstable patients. Reduce dose to 0.1–0.2 mg/kg or avoid entirely in these patients', 'Propofol Infusion Syndrome (PRIS) at >4 mg/kg/hr or >48 hr — monitor triglycerides, lactate, CK', 'Apnea common with bolus — have airway equipment ready'],
+      },
+    },
+    {
+      name: 'Ketamine',
+      tags: ['rsi', 'analgesia', 'sedation', 'procedural'],
+      subdoses: {
+        analgesia:  { push75: '7.5–22.5 mg',              push100: '10–30 mg',              drip75: '7.5–30 mg/hr',   drip100: '10–40 mg/hr',  dripLabel: 'Analgesia infusion' },
+        rsi:        { push75: '150 mg',                    push100: '200 mg' },
+        sedation:   { push75: '75–337.5 mg (dissociative)', push100: '100–450 mg (dissociative)', drip75: '7.5–45 mg/hr', drip100: '10–60 mg/hr', dripLabel: 'Sedation infusion' },
+        procedural: { push75: '75 mg (1 mg/kg); supplement 0.5 mg/kg PRN q10 min', push100: '100 mg (1 mg/kg); supplement 0.5 mg/kg PRN q10 min' },
+      },
+      kg75: {
+        push: 'Analgesia: 7.5–22.5 mg\nProcedural: 75 mg\nInduction/RSI: 150 mg\nDissociative: 75–337.5 mg',
+        dripStart: 'Analgesia: 7.5–30 mg/hr\nSedation: 7.5–45 mg/hr',
+        dripRange:  'Analgesia: 7.5–30 mg/hr\nSedation: 7.5–75 mg/hr',
+      },
+      kg100: {
+        push: 'Analgesia: 10–30 mg\nProcedural: 100 mg\nInduction/RSI: 200 mg\nDissociative: 100–450 mg',
+        dripStart: 'Analgesia: 10–40 mg/hr\nSedation: 10–60 mg/hr',
+        dripRange:  'Analgesia: 10–40 mg/hr\nSedation: 10–100 mg/hr',
+      },
+      details: {
+        onset:    '30–60 sec IV (analgesia onset 1–2 min)',
+        duration: 'Analgesia: 15–30 min; Procedural: 10–20 min; Dissociative: dose-dependent',
+        max:      'No absolute max; titrate to effect. Infusion generally ≤1 mg/kg/hr',
+        repeat:   'Analgesia: PRN every 15–30 min; Procedural: 0.5 mg/kg supplemental doses',
+        notes:    ['Sympathomimetic — preferred in hemodynamically unstable patients', 'Bronchodilator — useful in bronchospasm/asthma', 'Preserves airway reflexes (does not guarantee airway protection)', 'NMDA antagonist — opioid-sparing; reduces acute pain sensitization'],
+        cautions: ['Emergence reactions (dysphoria/hallucinations) — reduce with midazolam 1–2 mg IV', 'Increases ICP (evidence debated — use clinical judgment in TBI)', 'Increased secretions — consider glycopyrrolate 0.2 mg IV'],
+      },
+    },
+    {
+      name: 'Fentanyl',
+      tags: ['rsi', 'analgesia', 'sedation', 'procedural'],
+      subdoses: {
+        analgesia:  { push75: '25–100 mcg',   push100: '50–100 mcg' },
+        sedation:   { push75: '50–100 mcg',   push100: '50–100 mcg' },
+        rsi:        { push75: '150–300 mcg',  push100: '200–400 mcg' },
+        procedural: { push75: '50–100 mcg (analgesia adjunct; give 2–3 min before procedure)', push100: '50–100 mcg (analgesia adjunct; give 2–3 min before procedure)' },
+      },
+      kg75: {
+        push: 'Analgesia: 25–100 mcg\nModerate sedation: 50–100 mcg\nInduction adjunct: 150–300 mcg',
+        dripStart: '—', dripRange: '—',
+      },
+      kg100: {
+        push: 'Analgesia: 50–100 mcg\nModerate sedation: 50–100 mcg\nInduction adjunct: 200–400 mcg',
+        dripStart: '—', dripRange: '—',
+      },
+      details: {
+        onset:    '1–2 min IV',
+        duration: '30–60 min (single dose)',
+        max:      'Titrate to effect; induction adjunct: 2–4 mcg/kg',
+        repeat:   'Analgesia: every 1–2 hr PRN; titrate to pain score',
+        notes:    ['No histamine release — preferred over morphine in hemodynamic instability', 'Safe in renal failure — no active metabolites'],
+        cautions: ['Wooden chest (chest wall rigidity) with rapid high-dose bolus — treat with NMB or naloxone', 'Context-sensitive half-life increases significantly with prolonged infusion'],
+      },
+    },
+    {
+      name: 'Midazolam',
+      tags: ['rsi', 'analgesia', 'sedation', 'procedural'],
+      htnRisk: true,
+      subdoses: {
+        analgesia:  { push75: '0.5–2 mg (anxiolysis)',  push100: '1–2 mg (anxiolysis)' },
+        sedation:   { push75: '2–5 mg',                  push100: '2–5 mg' },
+        rsi:        { push75: '7.5–15 mg',               push100: '10–20 mg' },
+        procedural: { push75: '1–2 mg IV (anxiolysis adjunct); titrate 1 mg q2–3 min PRN; max 5 mg', push100: '1–2 mg IV (anxiolysis adjunct); titrate 1 mg q2–3 min PRN; max 5 mg' },
+      },
+      kg75: {
+        push: 'Anxiolysis: 0.5–2 mg\nModerate sedation: 2–5 mg\nInduction: 7.5–15 mg',
+        dripStart: '—', dripRange: '—',
+      },
+      kg100: {
+        push: 'Anxiolysis: 1–2 mg\nModerate sedation: 2–5 mg\nInduction: 10–20 mg',
+        dripStart: '—', dripRange: '—',
+      },
+      details: {
+        onset:    '2–3 min IV',
+        duration: '1–6 hr depending on dose and accumulation',
+        max:      'Procedural: 0.1 mg/kg (max ~10 mg); titrate slowly in 1–2 mg increments',
+        repeat:   'Procedural: 1–2 mg IV every 2–3 min PRN',
+        notes:    ['Synergistic respiratory depression with opioids — reduce doses when combined', 'Reversal: flumazenil 0.2 mg IV (repeat every 60 sec; max 1 mg total)'],
+        cautions: ['HYPOTENSION: vasodilates and synergizes with opioids to drop BP — reduce dose or avoid in hemodynamically unstable patients', 'Active metabolites accumulate in renal failure — prolonged sedation/respiratory depression', 'Paradoxical agitation/disinhibition possible (especially elderly)', 'Flumazenil duration shorter than midazolam — monitor for re-sedation'],
+      },
+    },
+    {
+      name: 'Morphine',
+      tags: ['analgesia', 'sedation', 'procedural'],
+      htnRisk: true,
+      subdoses: {
+        analgesia:  { push75: '2–10 mg',  push100: '2–10 mg' },
+        sedation:   { push75: '5–10 mg',  push100: '5–10 mg' },
+        procedural: { push75: '2–5 mg IV (analgesia adjunct; give 5–10 min before procedure)', push100: '2–5 mg IV (analgesia adjunct; give 5–10 min before procedure)' },
+      },
+      kg75:  { push: 'Analgesia: 2–10 mg\nModerate sedation: 5–10 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: 'Analgesia: 2–10 mg\nModerate sedation: 5–10 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '5–10 min IV',
+        duration: '3–5 hr',
+        max:      'Titrate to effect; no absolute IV max in acute pain management',
+        repeat:   'Every 3–4 hr (scheduled); 15–30 min PRN for breakthrough pain',
+        notes:    ['Reversal: naloxone 0.4–2 mg IV'],
+        cautions: ['HYPOTENSION: histamine release causes vasodilation — can significantly lower BP, especially in volume-depleted patients. Prefer fentanyl in hemodynamic instability', 'Avoid in renal failure — active metabolite (M6G) accumulates causing prolonged sedation/respiratory depression', 'Avoid in hepatic failure — significant accumulation risk'],
+      },
+    },
+    {
+      name: 'Dexmedetomidine',
+      tags: ['sedation'],
+      htnRisk: true,
+      subdoses: {
+        sedation: { push75: '75 mcg over 10 min', push100: '100 mcg over 10 min', drip75: '15–52.5 mcg/hr', drip100: '20–70 mcg/hr', dripLabel: 'Maintenance infusion' },
+      },
+      kg75:  { push: '75 mcg over 10 min',  dripStart: '15–45 mcg/hr', dripRange: '15–52.5 mcg/hr' },
+      kg100: { push: '100 mcg over 10 min', dripStart: '20–60 mcg/hr', dripRange: '20–70 mcg/hr' },
+      details: {
+        onset:    '5–15 min',
+        duration: '60–120 min after stopping infusion',
+        max:      '1.5 mcg/kg/hr (off-label protocols may go higher)',
+        repeat:   'N/A — continuous infusion; loading dose optional (increases side effects)',
+        notes:    ['Does NOT cause respiratory depression — safe for non-intubated patients', 'Alpha-2 agonist — analgesic-sparing, opioid-sparing properties', 'Reduces ICU delirium compared to benzodiazepines'],
+        cautions: ['HYPOTENSION + BRADYCARDIA: decreases sympathetic tone — do not use in patients who are already hypotensive or significantly bradycardic. Omit loading dose in hemodynamically unstable patients and start infusion at lowest rate', 'Avoid in high-degree heart block without pacemaker', 'Abrupt discontinuation after prolonged use may cause rebound hypertension'],
+      },
+    },
+    {
+      name: 'Etomidate',
+      tags: ['rsi', 'procedural'],
+      subdoses: {
+        rsi:        { push75: '15–30 mg',   push100: '20–40 mg' },
+        procedural: { push75: '7.5–15 mg (0.1–0.2 mg/kg; brief procedures only; single dose)', push100: '10–20 mg (0.1–0.2 mg/kg; brief procedures only; single dose)' },
+      },
+      kg75:  { push: '15–30 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '20–40 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '30–60 sec',
+        duration: '3–5 min',
+        max:      'Single dose preferred; avoid repeat dosing or infusions',
+        repeat:   'Single dose ONLY — do not repeat',
+        notes:    ['Hemodynamically neutral — minimal cardiovascular effects', 'Good choice in unstable patients when ketamine less desirable'],
+        cautions: ['Single dose causes adrenal suppression for 6–24 hr — use with caution in septic shock', 'Myoclonus common on injection (not seizure activity)', 'No analgesic properties — must combine with opioid for RSI', 'Pain on injection'],
+      },
+    },
+  ],
+
+  nmb: [
+    {
+      name: 'Succinylcholine',
+      tags: ['rsi'],
+      subdoses: {
+        rsi: { push75: '75–150 mg', push100: '100–200 mg' },
+      },
+      kg75:  { push: '75–150 mg',  dripStart: '—', dripRange: '—' },
+      kg100: { push: '100–200 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '45–60 sec',
+        duration: '8–12 min (depolarizing — CANNOT be reversed)',
+        max:      'RSI: 1.5–2 mg/kg; max 200 mg typical',
+        repeat:   'Avoid repeat dosing — risk of phase II block and severe bradycardia',
+        notes:    ['Fastest onset available for RSI', 'Depolarizing agent — no reversal agent exists'],
+        cautions: ['CONTRAINDICATED: hyperkalemia, crush injury >72h, burns >72h, denervating conditions (SCI/stroke/prolonged immobility), muscular dystrophy, personal or family history of malignant hyperthermia', 'Repeat/high doses → bradycardia (pretreat with atropine in pediatrics)', 'Malignant hyperthermia trigger — dantrolene is antidote'],
+      },
+    },
+    {
+      name: 'Rocuronium',
+      tags: ['rsi'],
+      subdoses: {
+        rsi: { push75: '45–90 mg', push100: '60–120 mg', drip75: '300–1200 mcg/min', drip100: '400–1600 mcg/min', dripLabel: 'Maintenance infusion' },
+      },
+      kg75:  { push: '45–90 mg',  dripStart: '300–1200 mcg/min', dripRange: '300–1200 mcg/min' },
+      kg100: { push: '60–120 mg', dripStart: '400–1600 mcg/min', dripRange: '400–1600 mcg/min' },
+      details: {
+        onset:    '60–90 sec (0.6 mg/kg); 45–60 sec (1.2 mg/kg RSI dose)',
+        duration: '30–60 min (0.6 mg/kg); 60–90 min (1.2 mg/kg)',
+        max:      '1.2 mg/kg for RSI; maintenance infusion titrate to TOF monitoring',
+        repeat:   'Maintenance: 0.1–0.2 mg/kg every 20–45 min PRN (or infusion)',
+        notes:    ['Reversal: sugammadex 4 mg/kg (moderate block); 16 mg/kg (immediate reversal)', 'Preferred over succinylcholine when sux is contraindicated'],
+        cautions: ['Duration prolonged significantly in hepatic failure', 'High-dose RSI (1.2 mg/kg): expect 60–90 min paralysis — confirm airway before giving'],
+      },
+    },
+    {
+      name: 'Vecuronium',
+      tags: ['rsi'],
+      subdoses: {
+        rsi: { push75: '6–7.5 mg', push100: '8–10 mg', drip75: '75 mcg/min', drip100: '100 mcg/min', dripLabel: 'Maintenance infusion' },
+      },
+      kg75:  { push: '6–7.5 mg', dripStart: '75 mcg/min',  dripRange: '75 mcg/min' },
+      kg100: { push: '8–10 mg',  dripStart: '100 mcg/min', dripRange: '100 mcg/min' },
+      details: {
+        onset:    '3–5 min (0.1 mg/kg); 1–2 min (0.3 mg/kg modified RSI)',
+        duration: '25–40 min (standard intubating dose)',
+        max:      'Intubation: 0.15 mg/kg; maintenance infusion titrate to TOF',
+        repeat:   'Maintenance: 0.01–0.015 mg/kg PRN or infusion',
+        notes:    ['Minimal cardiovascular effects', 'Reversal: neostigmine + glycopyrrolate, or sugammadex'],
+        cautions: ['Duration prolonged in BOTH hepatic and renal failure (dual excretion)', 'Slower onset than succinylcholine or high-dose rocuronium for RSI'],
+      },
+    },
+    {
+      name: 'Sugammadex',
+      tags: ['reversal'],
+      subdoses: {
+        reversal: { push75: '150–300 mg', push100: '200–400 mg' },
+      },
+      kg75:  { push: '150–300 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '200–400 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '2–3 min for full reversal',
+        duration: 'Permanent binding — recurarization rare with correct dosing',
+        max:      '16 mg/kg for immediate reversal after high-dose rocuronium',
+        repeat:   'Dose: 2 mg/kg moderate block; 4 mg/kg deep block; 16 mg/kg immediate (RSI rescue)',
+        notes:    ['Only reverses rocuronium and vecuronium — NOT succinylcholine', 'Fastest, most complete NMB reversal available'],
+        cautions: ['Renal failure: sugammadex-rocuronium complex accumulates — prolonged effect possible', 'Can interfere with hormonal contraceptives — advise backup method', 'Rare: bradycardia, hypersensitivity/anaphylaxis'],
+      },
+    },
+  ],
+
+  resuscitation: [
+    {
+      name: 'Amiodarone',
+      tags: ['cardiac'],
+      htnRisk: true,
+      kg75:  { push: '300 mg (VF/VT)\n150 mg (stable VT)', dripStart: '1 mg/min × 6 hr, then 0.5 mg/min', dripRange: '—' },
+      kg100: { push: '300 mg (VF/VT)\n150 mg (stable VT)', dripStart: '1 mg/min × 6 hr, then 0.5 mg/min', dripRange: '—' },
+      details: {
+        onset:    'Antiarrhythmic effect within minutes (IV)',
+        duration: 'Half-life 40–55 days (very long)',
+        max:      '2.2 g/24 hr in hospital; maintenance: 1 mg/min × 6 hr, then 0.5 mg/min × 18 hr',
+        repeat:   'VF/VT: 150 mg supplemental dose if recurs; then maintenance infusion after ROSC',
+        notes:    ['Multiple drug interactions: warfarin, digoxin, statins, QT-prolonging drugs', 'Alternative to lidocaine for shock-refractory VF/VT (AHA ACLS)'],
+        cautions: ['Rapid IV → hypotension and bradycardia — infuse loading dose over 10 min', 'Peripheral IV: high phlebitis risk — central line preferred for infusion', 'Chronic use: pulmonary toxicity, hepatotoxicity, thyroid dysfunction, corneal deposits'],
+      },
+    },
+    {
+      name: 'Atropine',
+      tags: ['cardiac', 'reversal'],
+      subdoses: {
+        cardiac:  { push75: '0.5–1 mg', push100: '0.5–1 mg' },
+        reversal: { push75: '0.5–1 mg (with neostigmine)', push100: '0.5–1 mg (with neostigmine)' },
+      },
+      kg75:  { push: '0.5–1 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '0.5–1 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '1–2 min IV',
+        duration: '4–6 hr',
+        max:      '3 mg IV total (full vagolytic dose)',
+        repeat:   'Every 3–5 min; maximum 3 mg total',
+        notes:    ['Minimum effective dose 0.5 mg to avoid paradoxical bradycardia', 'Given with neostigmine for NMB reversal to block muscarinic side effects'],
+        cautions: ['Ineffective in denervated heart (cardiac transplant recipients)', 'Ineffective in infranodal heart block (Mobitz II / complete) — transcutaneous pacing needed', 'Anticholinergic effects: urinary retention, dry mouth, blurred vision, confusion'],
+      },
+    },
+    {
+      name: 'Calcium Chloride',
+      tags: ['cardiac'],
+      kg75:  { push: '1–2 g', dripStart: '—', dripRange: '—' },
+      kg100: { push: '1–2 g', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '1–3 min IV',
+        duration: '30–60 min',
+        max:      '1–2 g per dose; may repeat every 10 min PRN',
+        repeat:   'Every 10 min PRN (hyperkalemia, hypocalcemia, CCB toxicity)',
+        notes:    ['3× more elemental calcium than calcium gluconate per volume', 'Indications: symptomatic hypocalcemia, hyperkalemia, hypermagnesemia, CCB overdose, beta-blocker OD'],
+        cautions: ['Central line strongly preferred — VESICANT; causes severe tissue necrosis with extravasation', 'Incompatible with sodium bicarbonate (precipitates immediately)'],
+      },
+    },
+    {
+      name: 'Calcium Gluconate',
+      tags: ['cardiac'],
+      kg75:  { push: '3–6 g', dripStart: '—', dripRange: '—' },
+      kg100: { push: '3–6 g', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '1–3 min IV',
+        duration: '30–60 min',
+        max:      '3–6 g per dose; may repeat every 10 min PRN',
+        repeat:   'Every 10 min PRN',
+        notes:    ['Can be given peripherally (less vesicant than calcium chloride)', 'Contains 1/3 the elemental calcium of CaCl by volume — same indications'],
+        cautions: ['Monitor IV site; extravasation still causes local irritation', 'Incompatible with sodium bicarbonate'],
+      },
+    },
+    {
+      name: 'Sodium Bicarbonate',
+      tags: ['cardiac'],
+      kg75:  { push: '50–150 mEq', dripStart: '—', dripRange: '—' },
+      kg100: { push: '50–150 mEq', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    'Immediate',
+        duration: 'Variable — depends on underlying etiology',
+        max:      'Titrate to ABG/pH goal; 1–2 mEq/kg typical in cardiac arrest',
+        repeat:   'Per ABG every 10 min in refractory cardiac arrest',
+        notes:    ['Indicated: severe metabolic acidosis, hyperkalemia, TCA overdose, sodium channel blocker toxicity'],
+        cautions: ['Generates CO2 — ensure adequate minute ventilation before administering', 'Overalkalization shifts oxyhemoglobin curve left, worsens intracellular acidosis', 'Incompatible with calcium solutions (precipitates)', 'Significant sodium load — caution in hypernatremia'],
+      },
+    },
+    {
+      name: 'Naloxone',
+      tags: ['reversal', 'cardiac'],
+      subdoses: {
+        reversal: { push75: '0.4–2 mg', push100: '0.4–2 mg' },
+        cardiac:  { push75: '0.4–2 mg', push100: '0.4–2 mg' },
+      },
+      kg75:  { push: '0.4–2 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '0.4–2 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '1–2 min IV; 3–5 min IM',
+        duration: '30–90 min (shorter than most opioids — re-narcotization risk)',
+        max:      '2 mg per dose; may repeat every 2–3 min; infusion if recurrent',
+        repeat:   'Every 2–3 min PRN; infusion: 2/3 of reversal dose per hour in 100 mL NS',
+        notes:    ['Titrate to respiratory effort — not full reversal', 'Infusion often needed as duration is shorter than most opioids'],
+        cautions: ['Abrupt full reversal: acute withdrawal, severe pain, catecholamine surge, pulmonary edema, cardiac arrhythmias — titrate carefully', 'Monitor 2–4 hr after reversal for re-narcotization'],
+      },
+    },
+    {
+      name: 'Lidocaine',
+      tags: ['cardiac'],
+      kg75:  { push: '75–112.5 mg', dripStart: '2–4 mg/min', dripRange: '2–4 mg/min' },
+      kg100: { push: '100–150 mg',  dripStart: '2–4 mg/min', dripRange: '2–4 mg/min' },
+      details: {
+        onset:    '45–90 sec IV',
+        duration: '15–20 min (single bolus)',
+        max:      'Push: 3 mg/kg total (1–1.5 mg/kg/dose); Infusion max: 4 mg/min',
+        repeat:   'Bolus: every 5–10 min (max 3 mg/kg total); then maintenance infusion',
+        notes:    ['Alternative to amiodarone for VF/pVT in cardiac arrest (AHA ACLS 2020)', 'RSI adjunct (1 mg/kg IV): blunts ICP and BP spike during laryngoscopy'],
+        cautions: ['Toxicity progression: perioral numbness → dizziness/tinnitus → seizures → cardiac arrest', 'Avoid in Wolff-Parkinson-White with AF (accelerates conduction)', 'Reduce infusion dose in hepatic failure or low cardiac output states'],
+      },
+    },
+  ],
+
+  antibiotics: [
+    {
+      name: 'Cefazolin',
+      tags: [],
+      kg75:  { push: '1–2 g', dripStart: '—', dripRange: '—' },
+      kg100: { push: '2–3 g', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    'N/A (IV infusion over 15–30 min)',
+        duration: '6–8 hr dosing interval',
+        max:      'Treatment: 6 g/day; Surgical prophylaxis: 2 g (3 g if >120 kg)',
+        repeat:   'Every 6–8 hr (treatment); repeat prophylaxis every 4 hr intraoperatively',
+        notes:    ['1st gen cephalosporin — excellent gram-positive coverage (MSSA, Streptococcus)', 'Standard surgical prophylaxis (SCIP measure)'],
+        cautions: ['Cross-reactivity with penicillin allergy ~1–2% (historical 10% figure is outdated)', 'Dose adjustment required in renal failure (CrCl <10: extend to every 12 hr)'],
+      },
+    },
+    {
+      name: 'Ceftriaxone',
+      tags: [],
+      kg75:  { push: '1–2 g', dripStart: '—', dripRange: '—' },
+      kg100: { push: '1–2 g', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    'N/A (IV infusion over 30 min)',
+        duration: '12–24 hr dosing interval (indication-dependent)',
+        max:      '4 g/day',
+        repeat:   'Every 12–24 hr depending on indication',
+        notes:    ['3rd gen cephalosporin — broad gram-negative coverage with good CNS penetration', 'No renal dose adjustment needed (primarily biliary excretion)'],
+        cautions: ['Incompatible with calcium-containing solutions (including Ringer\'s) — precipitate can be fatal', 'Avoid in neonates with hyperbilirubinemia', 'Max 4 g/day — higher doses do not improve efficacy'],
+      },
+    },
+    {
+      name: 'Ertapenem',
+      tags: [],
+      kg75:  { push: '1 g', dripStart: '—', dripRange: '—' },
+      kg100: { push: '1 g', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    'N/A (IV infusion over 30 min)',
+        duration: '24 hr dosing interval (once daily)',
+        max:      '1 g/day (standard); 500 mg/day in renal failure',
+        repeat:   'Once daily',
+        notes:    ['Carbapenem — broad spectrum including ESBL-producing gram-negatives and anaerobes', 'Convenient once-daily dosing'],
+        cautions: ['NOT active against Pseudomonas aeruginosa or Acinetobacter — use meropenem/imipenem instead', 'Dose reduction required for CrCl <30 mL/min', 'Seizure risk (carbapenem class effect) — lowest among carbapenems'],
+      },
+    },
+  ],
+
+  other: [
+    {
+      name: 'Tranexamic Acid (TXA)',
+      tags: ['cardiac'],
+      kg75:  { push: '1 g', dripStart: '—', dripRange: '—' },
+      kg100: { push: '1 g', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    'Immediate (antifibrinolytic effect)',
+        duration: '~3 hr half-life',
+        max:      '2 g total: 1 g load + 1 g maintenance over 8 hr',
+        repeat:   'Maintenance: 1 g IV over 8 hr after loading dose',
+        notes:    ['Most effective within 1 hr of injury; still beneficial up to 3 hr (CRASH-2 trial)', 'Reduces mortality in trauma hemorrhage; also used in surgery and postpartum hemorrhage'],
+        cautions: ['No benefit and possible harm if given >3 hr post-injury — time is critical', 'Administer loading dose slowly — rapid infusion causes hypotension', 'Relative contraindication: DIC, active thromboembolic disease, subarachnoid hemorrhage (controversial)'],
+      },
+    },
+    {
+      name: 'Levetiracetam',
+      tags: [],
+      kg75:  { push: '1000–1500 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '1500–3000 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '15 min (IV loading dose)',
+        duration: '12 hr dosing interval',
+        max:      'Loading dose up to 60 mg/kg IV; maintenance 3000 mg/day (some protocols 4500 mg/day)',
+        repeat:   'Maintenance: every 12 hr',
+        notes:    ['Minimal drug interactions — not CYP450 metabolized', 'No routine drug level monitoring required', 'Infuse loading dose over 15 min minimum'],
+        cautions: ['Behavioral side effects: irritability, aggression, psychosis (can be significant)', 'Dose adjustment required in renal failure (CrCl <80 mL/min)', 'Rapid infusion causes somnolence'],
+      },
+    },
+    {
+      name: 'Ephedrine',
+      tags: ['cardiac'],
+      kg75:  { push: '5–10 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '5–10 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '1–2 min IV',
+        duration: '15–60 min',
+        max:      '50 mg per episode; avoid excessive repeat dosing',
+        repeat:   'Every 3–5 min PRN; max ~3–5 doses before tachyphylaxis',
+        notes:    ['Indirect sympathomimetic — releases endogenous catecholamines', 'Useful for mild anesthesia-related hypotension; mixed α and β effects'],
+        cautions: ['Tachyphylaxis occurs rapidly — switch to direct vasopressor if repeated doses required', 'May cause tachycardia and arrhythmias'],
+      },
+    },
+    {
+      name: 'Glycopyrrolate',
+      tags: ['reversal'],
+      subdoses: {
+        reversal: { push75: '0.2–0.4 mg (with neostigmine)', push100: '0.2–0.4 mg (with neostigmine)' },
+      },
+      kg75:  { push: '0.2–0.4 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '0.2–0.4 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '2–3 min IV',
+        duration: '4–6 hr',
+        max:      '0.4 mg per dose',
+        repeat:   'PRN every 2–3 min as needed (NMB reversal adjunct)',
+        notes:    ['Quaternary ammonium — does NOT cross blood-brain barrier (no CNS anticholinergic effects)', 'Given with neostigmine to prevent muscarinic side effects (bradycardia, bronchospasm, secretions)', 'Also used as antisialagogue before intubation'],
+        cautions: ['Slower onset than atropine', 'Peripheral anticholinergic effects: urinary retention, dry mouth, blurred vision'],
+      },
+    },
+    {
+      name: 'Neostigmine',
+      tags: ['reversal'],
+      subdoses: {
+        reversal: { push75: '2.5–5 mg', push100: '2.5–5 mg' },
+      },
+      kg75:  { push: '2.5–5 mg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '2.5–5 mg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '1–2 min IV',
+        duration: '20–30 min',
+        max:      '5 mg per dose',
+        repeat:   'Single dose usually sufficient; verify with TOF monitoring',
+        notes:    ['Acetylcholinesterase inhibitor — reverses non-depolarizing NMBs', 'Always give with glycopyrrolate or atropine to prevent muscarinic crisis', 'Wait until TOF >0.1 (some spontaneous recovery present) before administering'],
+        cautions: ['Incomplete reversal at deep block (TOF <0.1) — use sugammadex instead for rocuronium/vecuronium', 'Does NOT reverse succinylcholine', 'Without anticholinergic pretreatment: severe bradycardia, bronchospasm, excessive secretions'],
+      },
+    },
+    {
+      name: 'Dantrolene',
+      tags: [],
+      kg75:  { push: '2.5 mg/kg', dripStart: '—', dripRange: '—' },
+      kg100: { push: '2.5 mg/kg', dripStart: '—', dripRange: '—' },
+      details: {
+        onset:    '2–3 min IV',
+        duration: 'Variable; repeat dosing required until symptoms resolve',
+        max:      '10 mg/kg (titrate to resolution; no hard ceiling)',
+        repeat:   'Every 5–10 min until MH symptoms resolve; max typically 10 mg/kg',
+        notes:    ['ONLY specific treatment for malignant hyperthermia (MH)', 'Also used for neuroleptic malignant syndrome (NMS)', 'Each vial = 20 mg; requires 60 mL sterile water to reconstitute — delegate to second provider'],
+        cautions: ['Prepare multiple vials simultaneously — MH crisis consumes large amounts rapidly', 'Call MH Hotline if available: 1-800-644-9737 (MHAUS)', 'Causes generalized muscle weakness — monitor ventilation', 'Hepatotoxicity with prolonged oral use (not relevant for acute IV use)'],
+      },
+    },
+  ],
+};
+
+/* ── NOTES DATA ──────────────────────────── */
+const NOTES = [
+  {
+    title: 'Ketamine Dosing',
+    items: [
+      'Sub-dissociative analgesia: 0.1–0.3 mg/kg IV bolus; infusion 0.1–0.4 mg/kg/hr',
+      'Procedural sedation: 1 mg/kg IV (onset 10–15 min)',
+      'Induction / RSI: 1–2 mg/kg IV (FDA-approved range 1–4.5 mg/kg)',
+      'Dissociative: 1–4.5 mg/kg IV — doses 0.5–0.9 mg/kg NOT recommended (dysphoria without adequate sedation)',
+      'Maintenance infusion: 0.1–0.5 mg/min (6–30 mg/hr) or up to 1 mg/kg/hr perioperative',
+    ],
+  },
+  {
+    title: 'Opioid & Benzodiazepine Specifics',
+    items: [
+      'Fentanyl: Analgesia 25–100 mcg; moderate sedation 50–100 mcg; induction adjunct 2–4 mcg/kg',
+      'Midazolam: Anxiolysis 0.5–2 mg; moderate sedation 1–5 mg (titrate slowly); induction 0.1–0.2 mg/kg',
+      'Morphine: 2–10 mg IV; reassess every 5–15 min',
+    ],
+  },
+  {
+    title: 'General Considerations',
+    items: [
+      'All doses for adults with normal renal and hepatic function — adjust for organ dysfunction',
+      'Vasopressor and sedative infusions: titrate to clinical effect and hemodynamic parameters',
+      'NMB dosing assumes use of peripheral nerve stimulation (TOF) monitoring',
+      'Cardiac arrest medications follow current AHA ACLS guidelines',
+      'Antibiotic dosing is typical treatment doses; surgical prophylaxis may differ',
+      'Ceftriaxone max daily dose: 4 g; no renal adjustment unless combined hepatic/renal dysfunction',
+      'Drip rates in absolute units (mcg/min or mg/min) — verify weight-based dosing against protocols',
+    ],
+  },
+];
+
+/* ── STATE ───────────────────────────────── */
+let currentCat    = 'vasopressors';
+let currentWeight = '75';
+let activeFilter  = 'all';
+let searchQuery   = '';
+let searchOpen    = false;
+let patientKg     = null;
+
+/* ── WEIGHT CALCULATOR ───────────────────── */
+function handleWeightInput(val) {
+  const kg    = parseFloat(val);
+  const group = document.getElementById('wtGroup');
+  const clear = document.getElementById('wtClear');
+  const badge = document.getElementById('bracketBadge');
+  if (!val || isNaN(kg) || kg <= 0) {
+    patientKg = null;
+    group.classList.remove('active');
+    clear.style.display = 'none';
+    badge.classList.remove('show');
+    return;
+  }
+  patientKg = kg;
+  group.classList.add('active');
+  clear.style.display = 'block';
+  const bracket = kg < 87.5 ? '75' : '100';
+  badge.textContent = '\u2248' + bracket + '\u202fkg dosing';
+  badge.classList.add('show');
+  if (currentWeight !== bracket) setWeight(bracket, false);
+  else renderContent();
+}
+
+function clearWeight() {
+  patientKg = null;
+  document.getElementById('wtInput').value = '';
+  document.getElementById('wtGroup').classList.remove('active');
+  document.getElementById('wtClear').style.display = 'none';
+  document.getElementById('bracketBadge').classList.remove('show');
+}
+
+function setWeight(w, clearPt = true) {
+  if (clearPt) clearWeight();
+  currentWeight = w;
+  document.getElementById('w75').classList.toggle('active',   w === '75');
+  document.getElementById('wBoth').classList.toggle('active', w === 'both');
+  document.getElementById('w100').classList.toggle('active',  w === '100');
+  renderContent();
+}
+
+/* ── SEARCH ──────────────────────────────── */
+function toggleSearch() {
+  searchOpen = !searchOpen;
+  document.getElementById('searchWrap').classList.toggle('open', searchOpen);
+  if (searchOpen) document.getElementById('searchInput').focus();
+  else {
+    searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    renderContent();
+  }
+}
+
+function handleSearch(q) {
+  searchQuery = q.toLowerCase().trim();
+  renderContent();
+}
+
+/* ── FILTERS ─────────────────────────────── */
+function renderFilterBar() {
+  document.getElementById('filterBar').innerHTML = FILTERS.map(f => `
+    <button class="fpill ${f.key === activeFilter ? 'active' : ''}"
+      style="--fc:${f.color}" onclick="setFilter('${f.key}')">${f.label}</button>`).join('');
+}
+
+function setFilter(key) {
+  activeFilter = key;
+  renderFilterBar();
+  renderTabs();
+  renderContent();
+  document.getElementById('content').scrollTop = 0;
+}
+
+/* ── TABS ────────────────────────────────── */
+function renderTabs() {
+  const el = document.getElementById('catTabs');
+  el.className = 'cat-tabs' + (activeFilter !== 'all' ? ' filtered' : '');
+  el.innerHTML = CATS.map(c => `
+    <button class="tab ${c.key === currentCat ? 'active' : ''}"
+      style="--cc:${c.color}" onclick="setCategory('${c.key}')">${c.label}</button>`).join('');
+  const active = el.querySelector('.active');
+  if (active) active.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+}
+
+function setCategory(key) {
+  currentCat   = key;
+  activeFilter = 'all';
+  searchQuery  = '';
+  if (searchOpen) {
+    searchOpen = false;
+    document.getElementById('searchWrap').classList.remove('open');
+    document.getElementById('searchInput').value = '';
+  }
+  renderFilterBar();
+  renderTabs();
+  renderContent();
+  document.getElementById('content').scrollTop = 0;
+}
+
+/* ── DOSE HTML HELPERS ───────────────────── */
+function dv(v, hl) {
+  const na = !v || v === '—';
+  return `<div class="dose-val${na ? ' na' : hl ? ' hl' : ''}">${v || '—'}</div>`;
+}
+function hasDrip(d) {
+  return (d.dripStart && d.dripStart !== '—') || (d.dripRange && d.dripRange !== '—');
+}
+function fullSingleHTML(d) {
+  const drip = hasDrip(d);
+  return `<div class="dose-single">
+    <div class="dose-row"><div class="dose-lbl">Push Dose</div>${dv(d.push)}</div>
+    ${drip ? `<div class="dose-row"><div class="dose-lbl">Drip Start</div>${dv(d.dripStart)}</div>
+    <div class="dose-row"><div class="dose-lbl">Drip Range</div>${dv(d.dripRange)}</div>` : ''}
+  </div>`;
+}
+function fullBothHTML(med) {
+  const d75 = med.kg75, d100 = med.kg100;
+  const drip = hasDrip(d75) || hasDrip(d100);
+  const col = (d, lbl) => `<div class="dose-col">
+    <div class="col-hdr">${lbl}</div>
+    <div class="dose-row"><div class="dose-lbl">Push</div>${dv(d.push)}</div>
+    ${drip ? `<div class="dose-row"><div class="dose-lbl">Drip Start</div>${dv(d.dripStart)}</div>
+    <div class="dose-row"><div class="dose-lbl">Drip Range</div>${dv(d.dripRange)}</div>` : ''}
+  </div>`;
+  return `<div class="dose-both">${col(d75,'75 kg')}${col(d100,'100 kg')}</div>`;
+}
+function subSingleHTML(sub, wt) {
+  const push = wt === '75' ? sub.push75 : sub.push100;
+  const drip = wt === '75' ? sub.drip75  : sub.drip100;
+  return `<div class="dose-single">
+    <div class="dose-row"><div class="dose-lbl">Push Dose</div>${dv(push, true)}</div>
+    ${drip ? `<div class="dose-row"><div class="dose-lbl">${sub.dripLabel||'Infusion'}</div>${dv(drip,true)}</div>` : ''}
+  </div>`;
+}
+function subBothHTML(sub) {
+  const drip = sub.drip75 || sub.drip100;
+  const col = (push, d, lbl) => `<div class="dose-col">
+    <div class="col-hdr">${lbl}</div>
+    <div class="dose-row"><div class="dose-lbl">Push</div>${dv(push, true)}</div>
+    ${drip ? `<div class="dose-row"><div class="dose-lbl">${sub.dripLabel||'Infusion'}</div>${dv(d,true)}</div>` : ''}
+  </div>`;
+  return `<div class="dose-both">${col(sub.push75,sub.drip75,'75 kg')}${col(sub.push100,sub.drip100,'100 kg')}</div>`;
+}
+
+/* ── DETAILS HTML ────────────────────────── */
+function detailsHTML(d) {
+  if (!d) return '';
+  const rows = [
+    ['Onset',    d.onset],
+    ['Duration', d.duration],
+    ['Max Dose', d.max],
+    ['Repeat',   d.repeat],
+  ].filter(r => r[1]);
+
+  const meta = rows.length ? `<div class="detail-meta">${
+    rows.map(([lbl,val]) => `<div class="detail-row">
+      <span class="detail-lbl">${lbl}</span>
+      <span class="detail-val">${val}</span>
+    </div>`).join('')
+  }</div>` : '';
+
+  const notesHTML  = (d.notes    || []).map(n => `<div class="dnote">${n}</div>`).join('');
+  const cautHTML   = (d.cautions || []).map(c => `<div class="dnote dcaution">${c}</div>`).join('');
+  const noteBlock  = (notesHTML || cautHTML)
+    ? `<div class="detail-notes">${notesHTML}${cautHTML}</div>` : '';
+
+  return `<hr class="detail-sep">${meta}${noteBlock}`;
+}
+
+/* ── CARD HTML ───────────────────────────── */
+function buildDoseHTML(med, filter) {
+  const sub = filter !== 'all' && med.subdoses && med.subdoses[filter];
+  if (currentWeight === 'both') return sub ? subBothHTML(sub) : fullBothHTML(med);
+  const wt = currentWeight;
+  return sub ? subSingleHTML(sub, wt) : fullSingleHTML(wt === '75' ? med.kg75 : med.kg100);
+}
+
+function cardHTML(med, catColor, catLabel, showBadge, expanded) {
+  const body = buildDoseHTML(med, activeFilter) + detailsHTML(med.details);
+  return `<div class="drug-card${expanded ? ' open' : ''}" style="--cc:${catColor}">
+    <div class="card-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <div class="cat-dot"></div>
+      <span class="drug-name">${med.name}</span>
+      ${med.htnRisk ? '<span class="htn-badge">&#x26A0; Hypotension</span>' : ''}
+      ${showBadge ? `<span class="cat-badge">${catLabel}</span>` : ''}
+      <span class="chevron">&#9660;</span>
+    </div>
+    <div class="card-body">${body}</div>
+  </div>`;
+}
+
+/* ── RENDER CONTENT ──────────────────────── */
+const DISCLAIMER = `<div class="disclaimer">
+  <strong>REFERENCE ONLY —</strong> Verify all doses against current SOPs and clinical judgment.
+  For use by qualified medical personnel only.
+</div>`;
+
+function renderContent() {
+  const el      = document.getElementById('content');
+  const scenHdr = document.getElementById('scenarioHdr');
+
+  /* SEARCH */
+  if (searchQuery) {
+    scenHdr.classList.remove('show');
+    const hits = [];
+    for (const cat of CATS) {
+      if (cat.key === 'notes') continue;
+      for (const med of (MEDS[cat.key] || []))
+        if (med.name.toLowerCase().includes(searchQuery)) hits.push({ med, cat });
+    }
+    el.innerHTML = hits.length
+      ? DISCLAIMER + hits.map(h => cardHTML(h.med, h.cat.color, h.cat.label, true, true)).join('')
+      : `<div class="empty"><h3>No results</h3><p>No medications match "${searchQuery}"</p></div>`;
+    return;
+  }
+
+  /* SCENARIO FILTER */
+  if (activeFilter !== 'all') {
+    const fObj = FILTERS.find(f => f.key === activeFilter);
+    const hits = [];
+    for (const cat of CATS) {
+      if (cat.key === 'notes') continue;
+      for (const med of (MEDS[cat.key] || []))
+        if ((med.tags || []).includes(activeFilter)) hits.push({ med, cat });
+    }
+    scenHdr.classList.add('show');
+    document.getElementById('scenarioPill').textContent = fObj.label;
+    document.getElementById('scenarioPill').style.setProperty('--fc', fObj.color);
+    document.getElementById('scenarioCount').textContent = `${hits.length} drug${hits.length !== 1 ? 's' : ''}`;
+    el.innerHTML = hits.length
+      ? DISCLAIMER + hits.map(h => cardHTML(h.med, h.cat.color, h.cat.label, true, true)).join('')
+      : `<div class="empty"><h3>No drugs in this scenario</h3></div>`;
+    return;
+  }
+
+  scenHdr.classList.remove('show');
+
+  /* NOTES TAB */
+  if (currentCat === 'notes') {
+    el.innerHTML = DISCLAIMER + NOTES.map(n => `
+      <div class="note-card">
+        <h3>${n.title}</h3>
+        <ul>${n.items.map(i => `<li>${i}</li>`).join('')}</ul>
+      </div>`).join('');
+    return;
+  }
+
+  /* NORMAL CATEGORY */
+  const catObj = CATS.find(c => c.key === currentCat);
+  const drugs  = MEDS[currentCat] || [];
+  el.innerHTML = DISCLAIMER + drugs.map(med => cardHTML(med, catObj.color, catObj.label, false, true)).join('');
+}
+
+/* ── INIT ────────────────────────────────── */
+function init() { renderFilterBar(); renderTabs(); renderContent(); }
+init();
+
+/* ── PWA: SERVICE WORKER + INSTALL ───────── */
+let deferredPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    console.log('SW registered:', reg.scope);
+    // Show offline badge once SW is active
+    if (reg.active) showOfflineBadge();
+    reg.addEventListener('updatefound', () => {
+      const newSW = reg.installing;
+      newSW.addEventListener('statechange', () => {
+        if (newSW.state === 'activated') showOfflineBadge();
+      });
+    });
+  }).catch(err => console.log('SW registration failed:', err));
+}
+
+function showOfflineBadge() {
+  const badge = document.getElementById('offlineBadge');
+  if (badge) badge.classList.add('show');
+}
+
+// Listen for beforeinstallprompt (Chrome/Edge/Android)
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('r2m_install_dismissed')) {
+    document.getElementById('installBanner').classList.add('show');
+  }
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(result => {
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+  }
+}
+
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('r2m_install_dismissed', '1');
+}
+
+// If already installed as PWA, hide banner
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+// Detect standalone mode (already installed)
+if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
+  showOfflineBadge();
+}
+</script>
+</body>
+</html>
