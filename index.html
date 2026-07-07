@@ -213,6 +213,22 @@
       border-radius: 5px; padding: 2px 6px; flex-shrink: 0; white-space: nowrap;
     }
 
+    /* ── DRIP SETUP (PUMP vs MANUAL) ─────── */
+    .drip-setup {
+      margin: 0 13px 11px; padding: 9px 11px;
+      background: rgba(88,166,255,.06); border: 1px solid rgba(88,166,255,.25);
+      border-radius: 9px;
+    }
+    .drip-setup-hdr {
+      font-size: 10px; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px;
+    }
+    .drip-setup .detail-row { margin-bottom: 5px; }
+    .drip-setup .detail-row:last-child { margin-bottom: 0; }
+    .drip-setup .detail-lbl { min-width: 78px; }
+    .drip-setup .detail-val { white-space: pre-line; }
+    .drip-note { font-size: 11px; color: var(--warn); line-height: 1.45; margin-top: 6px; }
+
     /* ── NOTES TAB ───────────────────────── */
     .note-card {
       background: var(--surf); border: 1px solid var(--border);
@@ -363,6 +379,12 @@ const MEDS = {
       tags: ['cardiac'],
       kg75:  { push: '1 mg (cardiac arrest)',  dripStart: '3.75–7.5 mcg/min',  dripRange: '3.75–150 mcg/min' },
       kg100: { push: '1 mg (cardiac arrest)',  dripStart: '5–10 mcg/min',       dripRange: '5–200 mcg/min' },
+      dripInfo: {
+        mix:    '4 mg in 250 mL NS/D5W = 16 mcg/mL',
+        pump:   { kg75: '14–28 mL/hr (start range); titrate to effect', kg100: '19–38 mL/hr (start range); titrate to effect' },
+        manual: { kg75: '14–28 gtt/min (60 gtt/mL micro set)', kg100: '19–38 gtt/min (60 gtt/mL micro set)' },
+        note:   'If only mixing 1 mg in 250 mL (4 mcg/mL), multiply listed rates ×4. Recount manual rate after every titration.',
+      },
       details: {
         onset:    'Immediate IV',
         duration: '5–10 min (infusion titrated to effect)',
@@ -377,6 +399,12 @@ const MEDS = {
       tags: ['cardiac'],
       kg75:  { push: '—', dripStart: '7.5–15 mcg/min',  dripRange: '7.5–150 mcg/min' },
       kg100: { push: '—', dripStart: '10–20 mcg/min',   dripRange: '10–200 mcg/min' },
+      dripInfo: {
+        mix:    '4 mg in 250 mL NS/D5W = 16 mcg/mL',
+        pump:   { kg75: '28–56 mL/hr (start range); titrate to MAP ≥65', kg100: '38–75 mL/hr (start range); titrate to MAP ≥65' },
+        manual: { kg75: '28–56 gtt/min (60 gtt/mL micro set)', kg100: '38–75 gtt/min (60 gtt/mL micro set)' },
+        note:   'Dedicated line, no other meds through it. Gravity drip only if no pump — recheck rate every 15 min; free-flow can be lethal.',
+      },
       details: {
         onset:    '1–2 min IV',
         duration: '1–2 min after stopping infusion',
@@ -391,6 +419,12 @@ const MEDS = {
       tags: ['cardiac'],
       kg75:  { push: '50–200 mcg', dripStart: '7.5–75 mcg/min',  dripRange: '7.5–750 mcg/min' },
       kg100: { push: '50–200 mcg', dripStart: '10–100 mcg/min',  dripRange: '10–1000 mcg/min' },
+      dripInfo: {
+        mix:    '10 mg in 250 mL NS = 40 mcg/mL',
+        pump:   { kg75: '11–113 mL/hr (start range); titrate to effect', kg100: '15–150 mL/hr (start range); titrate to effect' },
+        manual: { kg75: '11–113 gtt/min (60 gtt/mL micro set)', kg100: '15–150 gtt/min (60 gtt/mL micro set)' },
+        note:   'Manual counting above ~100 gtt/min is unreliable — if higher rates needed, double concentration (20 mg in 250 mL) and halve the rate.',
+      },
       details: {
         onset:    'Immediate IV push',
         duration: '15–20 min (push); continuous with infusion',
@@ -405,6 +439,12 @@ const MEDS = {
       tags: ['cardiac'],
       kg75:  { push: '—', dripStart: '150–375 mcg/min',  dripRange: '150–1500 mcg/min' },
       kg100: { push: '—', dripStart: '200–500 mcg/min',  dripRange: '200–2000 mcg/min' },
+      dripInfo: {
+        mix:    '400 mg in 250 mL D5W/NS = 1600 mcg/mL',
+        pump:   { kg75: '6–14 mL/hr (start range); titrate to effect', kg100: '8–19 mL/hr (start range); titrate to effect' },
+        manual: { kg75: '6–14 gtt/min (60 gtt/mL micro set)', kg100: '8–19 gtt/min (60 gtt/mL micro set)' },
+        note:   'Rates this slow are hard to count — for manual drips consider 200 mg in 250 mL (800 mcg/mL) and double the listed rates.',
+      },
       details: {
         onset:    '2–4 min',
         duration: 'Minutes after stopping infusion',
@@ -428,6 +468,12 @@ const MEDS = {
       },
       kg75:  { push: '20–40 mg',  dripStart: '25–50 mcg/kg/min', dripRange: '25–200 mcg/kg/min' },
       kg100: { push: '25–50 mg',  dripStart: '25–50 mcg/kg/min', dripRange: '25–200 mcg/kg/min' },
+      dripInfo: {
+        mix:    'Undiluted 10 mg/mL (1%) — do NOT dilute',
+        pump:   { kg75: '11–23 mL/hr (start range); titrate to sedation goal', kg100: '15–30 mL/hr (start range); titrate to sedation goal' },
+        manual: { kg75: '11–23 gtt/min (60 gtt/mL micro set) — last resort only', kg100: '15–30 gtt/min (60 gtt/mL micro set) — last resort only' },
+        note:   'Pump strongly preferred: uncontrolled gravity rate risks apnea and severe hypotension. If forced to run by gravity, continuous monitoring and recheck rate every 10–15 min. Discard tubing/vial at 12 hr (lipid — infection risk).',
+      },
       details: {
         onset:    '15–45 sec IV',
         duration: '5–10 min (short bolus)',
@@ -455,6 +501,12 @@ const MEDS = {
         push: 'Analgesia: 10–30 mg\nProcedural: 100 mg\nInduction/RSI: 200 mg\nDissociative: 100–450 mg',
         dripStart: 'Analgesia: 10–40 mg/hr\nSedation: 10–60 mg/hr',
         dripRange:  'Analgesia: 10–40 mg/hr\nSedation: 10–100 mg/hr',
+      },
+      dripInfo: {
+        mix:    '250 mg in 250 mL NS = 1 mg/mL',
+        pump:   { kg75: 'Analgesia: 8–30 mL/hr\nSedation: 8–45 mL/hr', kg100: 'Analgesia: 10–40 mL/hr\nSedation: 10–60 mL/hr' },
+        manual: { kg75: 'Analgesia: 8–30 gtt/min\nSedation: 8–45 gtt/min (60 gtt/mL micro set)', kg100: 'Analgesia: 10–40 gtt/min\nSedation: 10–60 gtt/min (60 gtt/mL micro set)' },
+        note:   'Most forgiving drip for gravity administration — wide safety margin. Still recount rate after any titration or patient movement.',
       },
       details: {
         onset:    '30–60 sec IV (analgesia onset 1–2 min)',
@@ -547,6 +599,12 @@ const MEDS = {
       },
       kg75:  { push: '75 mcg over 10 min',  dripStart: '15–45 mcg/hr', dripRange: '15–52.5 mcg/hr' },
       kg100: { push: '100 mcg over 10 min', dripStart: '20–60 mcg/hr', dripRange: '20–70 mcg/hr' },
+      dripInfo: {
+        mix:    '200 mcg in 50 mL NS = 4 mcg/mL',
+        pump:   { kg75: '4–13 mL/hr', kg100: '5–18 mL/hr' },
+        manual: { kg75: 'NOT recommended — pump only', kg100: 'NOT recommended — pump only' },
+        note:   'Rates too low to count reliably by gravity; overdose causes bradycardia/hypotension. If no pump available, choose a different sedation strategy.',
+      },
       details: {
         onset:    '5–15 min',
         duration: '60–120 min after stopping infusion',
@@ -602,6 +660,12 @@ const MEDS = {
       },
       kg75:  { push: '45–90 mg',  dripStart: '300–1200 mcg/min', dripRange: '300–1200 mcg/min' },
       kg100: { push: '60–120 mg', dripStart: '400–1600 mcg/min', dripRange: '400–1600 mcg/min' },
+      dripInfo: {
+        mix:    '100 mg in 100 mL NS = 1 mg/mL',
+        pump:   { kg75: '18–72 mL/hr; titrate to TOF 1–2 twitches', kg100: '24–96 mL/hr; titrate to TOF 1–2 twitches' },
+        manual: { kg75: 'NOT recommended — use intermittent boluses 0.1–0.2 mg/kg PRN instead', kg100: 'NOT recommended — use intermittent boluses 0.1–0.2 mg/kg PRN instead' },
+        note:   'Paralytic by uncontrolled gravity drip risks awareness under paralysis and dosing error. No pump → redose as intermittent boluses with adequate sedation FIRST.',
+      },
       details: {
         onset:    '60–90 sec (0.6 mg/kg); 45–60 sec (1.2 mg/kg RSI dose)',
         duration: '30–60 min (0.6 mg/kg); 60–90 min (1.2 mg/kg)',
@@ -619,6 +683,12 @@ const MEDS = {
       },
       kg75:  { push: '6–7.5 mg', dripStart: '75 mcg/min',  dripRange: '75 mcg/min' },
       kg100: { push: '8–10 mg',  dripStart: '100 mcg/min', dripRange: '100 mcg/min' },
+      dripInfo: {
+        mix:    '20 mg in 20 mL sterile water = 1 mg/mL',
+        pump:   { kg75: '4.5 mL/hr; titrate to TOF 1–2 twitches', kg100: '6 mL/hr; titrate to TOF 1–2 twitches' },
+        manual: { kg75: 'NOT recommended — use intermittent boluses 0.01–0.015 mg/kg PRN instead', kg100: 'NOT recommended — use intermittent boluses 0.01–0.015 mg/kg PRN instead' },
+        note:   'Paralytic by uncontrolled gravity drip risks awareness under paralysis. No pump → redose as intermittent boluses with adequate sedation FIRST.',
+      },
       details: {
         onset:    '3–5 min (0.1 mg/kg); 1–2 min (0.3 mg/kg modified RSI)',
         duration: '25–40 min (standard intubating dose)',
@@ -654,6 +724,12 @@ const MEDS = {
       htnRisk: true,
       kg75:  { push: '300 mg (VF/VT)\n150 mg (stable VT)', dripStart: '1 mg/min × 6 hr, then 0.5 mg/min', dripRange: '—' },
       kg100: { push: '300 mg (VF/VT)\n150 mg (stable VT)', dripStart: '1 mg/min × 6 hr, then 0.5 mg/min', dripRange: '—' },
+      dripInfo: {
+        mix:    '900 mg in 500 mL D5W = 1.8 mg/mL (load: 150 mg in 100 mL D5W over 10 min)',
+        pump:   { kg75: '33 mL/hr × 6 hr, then 17 mL/hr × 18 hr', kg100: '33 mL/hr × 6 hr, then 17 mL/hr × 18 hr' },
+        manual: { kg75: '33 gtt/min × 6 hr, then 17 gtt/min (60 gtt/mL micro set)', kg100: '33 gtt/min × 6 hr, then 17 gtt/min (60 gtt/mL micro set)' },
+        note:   'D5W only (precipitates in NS in PVC bags per some formulations); use in-line filter if available. Central line preferred — high phlebitis risk.',
+      },
       details: {
         onset:    'Antiarrhythmic effect within minutes (IV)',
         duration: 'Half-life 40–55 days (very long)',
@@ -732,6 +808,12 @@ const MEDS = {
       },
       kg75:  { push: '0.4–2 mg', dripStart: '—', dripRange: '—' },
       kg100: { push: '0.4–2 mg', dripStart: '—', dripRange: '—' },
+      dripInfo: {
+        mix:    '2 mg in 500 mL NS/D5W = 4 mcg/mL',
+        pump:   { kg75: 'Run 2/3 of effective reversal dose per hr (e.g., 0.4 mg reversed → ~0.27 mg/hr = 67 mL/hr)', kg100: 'Run 2/3 of effective reversal dose per hr (e.g., 0.4 mg reversed → ~0.27 mg/hr = 67 mL/hr)' },
+        manual: { kg75: '~67 gtt/min for the 0.4 mg example (60 gtt/mL micro set)', kg100: '~67 gtt/min for the 0.4 mg example (60 gtt/mL micro set)' },
+        note:   'Titrate to respiratory rate ≥10–12, not full arousal. Reassess frequently — need for the drip ends when the opioid wears off.',
+      },
       details: {
         onset:    '1–2 min IV; 3–5 min IM',
         duration: '30–90 min (shorter than most opioids — re-narcotization risk)',
@@ -746,6 +828,12 @@ const MEDS = {
       tags: ['cardiac'],
       kg75:  { push: '75–112.5 mg', dripStart: '2–4 mg/min', dripRange: '2–4 mg/min' },
       kg100: { push: '100–150 mg',  dripStart: '2–4 mg/min', dripRange: '2–4 mg/min' },
+      dripInfo: {
+        mix:    '2 g in 500 mL D5W = 4 mg/mL',
+        pump:   { kg75: '30–60 mL/hr (2–4 mg/min)', kg100: '30–60 mL/hr (2–4 mg/min)' },
+        manual: { kg75: '30–60 gtt/min (60 gtt/mL micro set)', kg100: '30–60 gtt/min (60 gtt/mL micro set)' },
+        note:   'Watch for toxicity (perioral numbness, tinnitus, confusion) — stop the drip immediately if present. Reduce rate in hepatic failure/shock.',
+      },
       details: {
         onset:    '45–90 sec IV',
         duration: '15–20 min (single bolus)',
@@ -808,6 +896,12 @@ const MEDS = {
       tags: ['cardiac'],
       kg75:  { push: '1 g', dripStart: '—', dripRange: '—' },
       kg100: { push: '1 g', dripStart: '—', dripRange: '—' },
+      dripInfo: {
+        mix:    'Load: 1 g in 100 mL NS over 10 min. Maintenance: 1 g in 500 mL NS = 2 mg/mL over 8 hr',
+        pump:   { kg75: 'Load: 600 mL/hr × 10 min, then 63 mL/hr × 8 hr', kg100: 'Load: 600 mL/hr × 10 min, then 63 mL/hr × 8 hr' },
+        manual: { kg75: 'Maintenance: 63 gtt/min (micro set) or ~16 gtt/min (15 gtt/mL macro set)', kg100: 'Maintenance: 63 gtt/min (micro set) or ~16 gtt/min (15 gtt/mL macro set)' },
+        note:   'Loading dose over 10 min minimum — rapid push causes hypotension. Maintenance bag runs well by gravity.',
+      },
       details: {
         onset:    'Immediate (antifibrinolytic effect)',
         duration: '~3 hr half-life',
@@ -914,6 +1008,19 @@ const NOTES = [
       'Fentanyl: Analgesia 25–100 mcg; moderate sedation 50–100 mcg; induction adjunct 2–4 mcg/kg',
       'Midazolam: Anxiolysis 0.5–2 mg; moderate sedation 1–5 mg (titrate slowly); induction 0.1–0.2 mg/kg',
       'Morphine: 2–10 mg IV; reassess every 5–15 min',
+    ],
+  },
+  {
+    title: 'Drip Rates — Pump vs Manual (Gravity)',
+    items: [
+      'No pump? Run by gravity and count drops: gtt/min = (mL/hr × drop factor) ÷ 60',
+      'Microdrip set (60 gtt/mL): gtt/min = mL/hr — the numbers are identical. Preferred set for ALL medication drips',
+      'Macrodrip conversions: 10 gtt/mL → mL/hr ÷ 6; 15 gtt/mL → mL/hr ÷ 4; 20 gtt/mL → mL/hr ÷ 3',
+      'Count drops for a full 60 seconds (or 15 sec × 4) at eye level with the drip chamber',
+      'Gravity rates drift — recount after every titration, bag change, patient movement, or BP change; recheck vasopressor drips every 15 min',
+      'Vasopressors: dedicated line, clamp closed while adjusting — accidental free-flow can be lethal',
+      'Pump ONLY (never gravity): dexmedetomidine and NMB infusions — if no pump, use intermittent boluses or a different agent',
+      'Rates in each drug card assume the standard mix listed on that card — recalculate if you mix a different concentration',
     ],
   },
   {
@@ -1081,6 +1188,33 @@ function subBothHTML(sub) {
   return `<div class="dose-both">${col(sub.push75,sub.drip75,'75 kg')}${col(sub.push100,sub.drip100,'100 kg')}</div>`;
 }
 
+/* ── DRIP SETUP HTML (PUMP vs MANUAL) ────── */
+function dripInfoHTML(med) {
+  const di = med.dripInfo;
+  if (!di) return '';
+  const pick = o => {
+    if (!o) return null;
+    if (typeof o === 'string') return o;
+    if (currentWeight === 'both') {
+      return o.kg75 === o.kg100 ? o.kg75 : `75 kg: ${o.kg75}\n100 kg: ${o.kg100}`;
+    }
+    return currentWeight === '75' ? o.kg75 : o.kg100;
+  };
+  const rows = [
+    ['Mix',         di.mix],
+    ['Pump Rate',   pick(di.pump)],
+    ['Manual Drip', pick(di.manual)],
+  ].filter(r => r[1]);
+  return `<div class="drip-setup">
+    <div class="drip-setup-hdr">Drip Setup — Pump / Manual</div>
+    ${rows.map(([lbl,val]) => `<div class="detail-row">
+      <span class="detail-lbl">${lbl}</span>
+      <span class="detail-val">${val}</span>
+    </div>`).join('')}
+    ${di.note ? `<div class="drip-note">&#x26A0; ${di.note}</div>` : ''}
+  </div>`;
+}
+
 /* ── DETAILS HTML ────────────────────────── */
 function detailsHTML(d) {
   if (!d) return '';
@@ -1115,7 +1249,7 @@ function buildDoseHTML(med, filter) {
 }
 
 function cardHTML(med, catColor, catLabel, showBadge, expanded) {
-  const body = buildDoseHTML(med, activeFilter) + detailsHTML(med.details);
+  const body = buildDoseHTML(med, activeFilter) + dripInfoHTML(med) + detailsHTML(med.details);
   return `<div class="drug-card${expanded ? ' open' : ''}" style="--cc:${catColor}">
     <div class="card-hdr" onclick="this.parentElement.classList.toggle('open')">
       <div class="cat-dot"></div>

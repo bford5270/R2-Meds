@@ -1,4 +1,4 @@
-const CACHE_NAME = 'role2-meds-v1';
+const CACHE_NAME = 'role2-meds-v2';
 const ASSETS = [
   './',
   './index.html',
